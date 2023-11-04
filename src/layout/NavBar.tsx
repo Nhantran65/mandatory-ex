@@ -8,7 +8,7 @@ const Navbar: React.FC = () => {
           <div className="text-white text-2xl font-bold">Task Manager App</div>
           <ul className="flex space-x-4">
             <li>
-              <a href="/" className="text-white hover:text-blue-300">Home</a>
+              <a href="/" className="text-white hover:text-blue-300 ">Home</a>
             </li>
             <li>
               <a href="/about" className="text-white hover:text-blue-300">About</a>
@@ -17,7 +17,7 @@ const Navbar: React.FC = () => {
               <a href="/table" className="text-white hover:text-blue-300">Table Tasks</a>
             </li>
             <li>
-              <a href="#" className="text-white hover:text-blue-300">Contact</a>
+              <a href="#" className="text-white hover:text-blue-300">Setting</a>
             </li>
           </ul>
         </div>
