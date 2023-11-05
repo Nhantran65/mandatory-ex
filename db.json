@@ -1,73 +1,28 @@
 {
   "tasks": [
     {
-      "id": 1,
-      "name": "Task 1",
+      "id": 5,
+      "name": "jhjh",
       "tags": [
-        "tag2",
-        "tag2"
+        "jhjgfgfgfg"
       ],
-      "active": false,
-      "dateTime": "2023-11-04T12:00:00Z",
-      "createdDate": "2023-11-01T08:30:00Z"
-    },
-    {
-      "id": 2,
-      "name": "Task 2",
-      "tags": [
-        "tag2",
-        "tag3"
-      ],
-      "active": true,
-      "dateTime": "2023-11-05T15:30:00Z",
-      "createdDate": "2023-11-02T10:45:00Z"
+      "active": true
     },
     {
       "id": 3,
-      "name": "Task 3",
+      "name": "fgfggfgf",
       "tags": [
-        "tag1",
-        "tag3"
+        "gfgffggf"
       ],
-      "active": true,
-      "dateTime": "2023-11-06T10:15:00Z",
-      "createdDate": "2023-11-03T16:20:00Z"
+      "active": true
     },
     {
       "id": 4,
-      "name": "Nhan",
+      "name": "gfgffgfg",
       "tags": [
-        "Chau"
+        "gffgfgfg"
       ],
-      "active": false,
-      "dateTime": "2023-11-07T14:45:00Z",
-      "createdDate": "2023-11-04T12:30:00Z"
-    },
-    {
-      "id": 5,
-      "name": "mm",
-      "tags": [
-        "1"
-      ],
-      "active": false,
-      "dateTime": "2023-11-08T09:00:00Z",
-      "createdDate": "2023-11-05T11:15:00Z"
-    },
-    {
-      "id": 6,
-      "name": "dd",
-      "tags": [
-        "đ"
-      ],
-      "active": true
-    },
-    {
-      "id": 7,
-      "name": "dd",
-      "tags": [
-        ""
-      ],
-      "active": true
+      "active": false
     }
   ]
 }

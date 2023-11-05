@@ -4,6 +4,7 @@ interface Task {
   id: number;
   name: string;
   tags: string[];
+  active: boolean; // Thêm trường active
 }
 
 const TaskTable: React.FC = () => {
@@ -44,6 +45,7 @@ const TaskTable: React.FC = () => {
               <th className="p-3 text-left bg-gray-200">ID</th>
               <th className="p-3 text-left bg-gray-200">Name</th>
               <th className="p-3 text-left bg-gray-200">Tags</th>
+              <th className="p-3 text-left bg-gray-200">Active</th>
             </tr>
           </thead>
           <tbody>
@@ -52,6 +54,9 @@ const TaskTable: React.FC = () => {
                 <td className="p-3">{task.id}</td>
                 <td className="p-3">{task.name}</td>
                 <td className="p-3">{task.tags.join(', ')}</td>
+                <td className="p-3">
+                  {task.active ? 'Active' : 'Inactive'}
+                </td>
               </tr>
             ))}
           </tbody>

@@ -73,6 +73,12 @@ const TaskList: React.FC = () => {
       setNewTaskName(task.name);
       setNewTaskTags(task.tags);
     };
+
+    const handleCancleEditTask  = () => {
+        setEditingTask(null);
+        setNewTaskName('');
+        setNewTaskTags([]);
+      };                                     
   
     // Lưu công việc đã chỉnh sửa
     const handleSaveTask = async () => {
@@ -134,31 +140,69 @@ const TaskList: React.FC = () => {
     };
   
     // Toggle trạng thái active của một tag trong công việc
-    const handleToggleTagActive = (task: Task, tagIndex: number) => {
-      const updatedTasks = [...tasks];
-      const updatedTask = { ...task };
-      updatedTask.tags[tagIndex] = task.tags[tagIndex]; // Chuyển đổi trạng thái active của tag
-      updatedTasks[task.id - 1] = updatedTask; // Cập nhật công việc trong danh sách
+    // Hàm xử lý sự kiện để thay đổi trạng thái Active/Inactive của Task
+const handleToggleTaskActive = async (task: Task) => {
+    const updatedTask: Task = {
+      ...task,
+      active: !task.active, // Đảo ngược trạng thái
+    };
   
-      // Gửi công việc đã cập nhật lên API để lưu thay đổi
-      fetch(`http://localhost:3010/tasks/${task.id}`, {
+    try {
+      const response = await fetch(`http://localhost:3010/tasks/${task.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(updatedTask),
-      })
-        .then((response) => {
-          if (response.status === 200) {
-            setTasks(updatedTasks);
-          } else {
-            console.error('Error updating tag status:', response.statusText);
-          }
-        })
-        .catch((error) => {
-          console.error('Error updating tag status:', error);
+      });
+  
+      if (response.status === 200) {
+        const updatedTaskData = await response.json();
+        const updatedTasks = tasks.map((t) =>
+          t.id === updatedTaskData.id ? updatedTaskData : t
+        );
+        setTasks(updatedTasks);
+      } else {
+        console.error('Error toggling task active status:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error toggling task active status:', error);
+    }
+  };
+
+  // Hàm xử lý sự kiện để thay đổi trạng thái của Task
+const handleToggleTaskStatus = async (taskId: number, active: boolean) => {
+    const task = tasks.find((t) => t.id === taskId);
+  
+    if (task) {
+      const updatedTask: Task = {
+        ...task,
+        active,
+      };
+  
+      try {
+        const response = await fetch(`http://localhost:3010/tasks/${taskId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updatedTask),
         });
-    };
+  
+        if (response.status === 200) {
+          const updatedTaskData = await response.json();
+          const updatedTasks = tasks.map((t) =>
+            t.id === updatedTaskData.id ? updatedTaskData : t
+          );
+          setTasks(updatedTasks);
+        } else {
+          console.error('Error toggling task status:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Error toggling task status:', error);
+      }
+    }
+  };
 
   return (
     <div className="max-w-lg mx-auto p-4">
@@ -187,110 +231,125 @@ const TaskList: React.FC = () => {
         </button>
       </div>
 
+      <div className='mb-4'>
+    <input
+      type="text"
+      placeholder="Task name"
+      value={newTaskName}
+      onChange={(e) => setNewTaskName(e.target.value)}
+      className="w-full p-2 border rounded mb-2"
+    />
+    <input
+      type="text"
+      placeholder="Add tags (comma-separated)"
+      value={newTaskTags.join(', ')}
+      onChange={(e) => setNewTaskTags(e.target.value.split(', '))}
+      className="w-full p-2 border rounded mb-2"
+    />
+    <button
+      onClick={handleAddTask}
+      className="bg-green-500 text-white p-2 rounded"
+    >
+      Add Task
+    </button>
+  </div>  
       
       <ul>
-        {tasks
-            .filter((task) => {
-                if (filteredStatus === 'active') {
-                return task.active;
-                } else if (filteredStatus === 'unactive') {
-                return !task.active;
-                }
-                return true; // Hiển thị tất cả trạng thái
-            })
-            
-            .map((task) => (
-            <li key={task.id} className="mb-4 p-2 border rounded">
-                {task === editingTask ? (
-                <div>
-                    <input
-                    type="text"
-                    value={newTaskName}
-                    onChange={(e) => setNewTaskName(e.target.value)}
-                    className="w-full p-2 border rounded mb-2"
-                    />
-                    {newTaskTags.map((tag, index) => (
-                    <div key={index}>
-                        <input
-                        type="text"
-                        value={tag}
-                        onChange={(e) => {
-                            const updatedTags = [...newTaskTags];
-                            updatedTags[index] = e.target.value;
-                            setNewTaskTags(updatedTags);
-                        }}
-                        className="w-full p-2 border rounded mb-2"
-                        />
-                        <button
-                            onClick={() => handleToggleTagActive(task, index)}
-                            className={`bg-${task.active ? 'green' : 'red'}-500 text-white p-2 rounded`}
-    >
-                            {task.active ? 'Active' : 'Inactive'}
-                        </button>
-
-                    </div>
-                    ))}
-                    <button
-                    onClick={handleSaveTask}
-                    className="bg-blue-500 text-white p-2 rounded"
-                    >
-                    Save
-                    </button>
-                </div>
-                ) : (
-                <div>
-                    <p className="text-lg">{task.name}</p>
-                    {task.tags.map((tag, index) => (
-                    <div key={index}>
-                        <p className="text-gray-600 text-sm">Tag: {tag}</p>
-                        <button
-                            onClick={() => handleToggleTagActive(task, index)}
-                            className={`bg-${task.active ? 'green' : 'red'}-500 text-white p-2 rounded`}
-                        >
-                                {task.active ? 'Active' : 'Inactive'}
-                        </button>
-
-                    </div>
-                    ))}
-                    <button
-                    onClick={() => handleEditTask(task)}
-                    className="bg-yellow-500 text-white p-2 rounded m-2"
-                    >
-                    Edit
-                    </button>
-                    <button
-                    onClick={() => handleDeleteTask(task.id)}
-                    className="bg-red-500 text-white p-2 rounded m-2"
-                    >
-                    Delete
-                    </button>
-                </div>
-                )}
-            </li>
-            ))}
-      </ul>
-      <div>
-        <input
-          type="text"
-          placeholder="Task name"
-          value={newTaskName}
-          onChange={(e) => setNewTaskName(e.target.value)}
-          className="w-full p-2 border rounded mb-2"
-        />
-        <input
-          type="text"
-          placeholder="Add tags (comma-separated)"
-          value={newTaskTags.join(', ')}
-          onChange={(e) => setNewTaskTags(e.target.value.split(', '))}
-          className="w-full p-2 border rounded mb-2"
-        />
-        <button
-          onClick={handleAddTask}
-          className="bg-green-500 text-white p-2 rounded"
-        >
-          Add Task
-        </button>
-      </div>
+  {tasks
+      .filter((task) => {
+          if (filteredStatus === 'active') {
+            return task.active;
+          } else if (filteredStatus === 'unactive') {
+            return !task.active;
+          }
+          return true; // Hiển thị tất cả trạng thái
+      })
+      
+      .map((task) => (
+      <li key={task.id} className="mb-4 p-2 border rounded">
+          {task === editingTask ? (
+          <div>
+              <input
+              type="text"
+              value={newTaskName}
+              onChange={(e) => setNewTaskName(e.target.value)}
+              className="w-full p-2 border rounded mb-2"
+              />
+              {newTaskTags.map((tag, index) => (
+              <div key={index}>
+                  <input
+                  type="text"
+                  value={tag}
+                  onChange={(e) => {
+                      const updatedTags = [...newTaskTags];
+                      updatedTags[index] = e.target.value;
+                      setNewTaskTags(updatedTags);
+                  }}
+                  className="w-full p-2 border rounded mb-2"
+                  />
+              </div>
+              ))}
+              <button
+              onClick={handleSaveTask}
+              className="bg-blue-500 text-white p-2 rounded"
+              >
+              Save
+              </button>
+              <button
+                  onClick={handleCancleEditTask}
+                  className="bg-gray-400 text-white p-2 rounded ml-2"
+                >
+                  Cancel
+                </button>
+          </div>
+          ) : (
+          <div>
+              <p className="text-lg">{task.name}</p>
+              {task.tags.map((tag, index) => (
+              <div key={index}>
+                  <p className="text-gray-600 text-sm">Tag: {tag}</p>
+              </div>
+              ))}
+              <button
+              onClick={() => handleEditTask(task)}
+              className="bg-yellow-500 text-white p-2 rounded m-2"
+              >
+              Edit
+              </button>
+              <button
+              onClick={() => handleDeleteTask(task.id)}
+              className="bg-red-500 text-white p-2 rounded m-2"
+              >
+              Delete
+              </button>
+              {/* Thêm nút Toggle Task Active/Inactive */}
+              <button
+              onClick={() => handleToggleTaskActive(task)}
+              className={`bg-${task.active ? 'red' : 'green'}-500 text-white p-2 rounded`}
+              >
+                {task.active ? 'Deactivate' : 'Activate'}
+              </button>
+               {/* Thêm nút "Active" và "Inactive" */}
+               {task.active ? (
+                  <button
+                      onClick={() => handleToggleTaskStatus(task.id, false)}
+                      className="bg-blue-500 text-white p-2 rounded m-2"
+                  >
+                      Inactive
+                  </button>
+              ) : (
+                  <button
+                      onClick={() => handleToggleTaskStatus(task.id, true)}
+                      className="bg-green-500 text-white p-2 rounded m-2"
+                  >
+                      Active
+                  </button>)}
+          </div>
+          )}
+      </li>
+      ))}
+</ul>
+      
     </div>
   );
 }

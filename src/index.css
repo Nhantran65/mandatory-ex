@@ -2,4 +2,12 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
+/* styles.css (hoặc file CSS tương tự) */
+
+.dark-mode {
+  background-color: #333; /* Màu nền Dark Mode */
+  color: #fff; /* Màu chữ trắng trong Dark Mode */
+}
+
+/* Các kiểu CSS khác cho Dark Mode */
 
